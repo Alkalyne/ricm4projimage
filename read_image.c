@@ -96,38 +96,20 @@ void init( int cube[],int length)
 //Rempli le contenu d'un histogramme à partir d'une CIMAGE
 void colorSection(int cube[], CIMAGE cim)
 {
-	int k;
-	for (int j = 0; j < cim.nx; j++) 
+	int k=0;
+	for (int i = 0; i < cim.nx; i++) 
 	{      
-		for (int i = 0; i < cim.ny; i++) 
+		for (int j = 0; j < cim.ny; j++) 
 		{ 
-			k = cim.r[i][j]/64 + 4*cim.g[i][j]/64 + 16*cim.b[i][j]/64;
-			if(k>=64)
-				printf("\nk : %i",k);
+			int R = cim.r[i][j]/64;
+			int G = cim.g[i][j]/64;
+			int B = cim.b[i][j]/64;
+
+			k = R + G *4 + B*16;
 			cube[k]++;
 		}
 	}
 }
 
-
-int datas[64];
-  
-  for(i =0; i<64;i++) datas[i] = 0;
-
-  for (j = 0; j < cim.nx; j++) {       /* ligne par ligne */
-    printf("  ");
-    for (i = 0; i < cim.ny; i++) {   /* pixel par pixel */
-     	
-	 int tempR = cim.r[i][j]/64;
-	 int tempB = cim.b[i][j]/64;
-	 int tempG = cim.g[i][j]/64;
-	 
-	 datas[tempR + tempB *4 + tempG*16]++;
-    }
-
-  }
-    for(i =0; i<64;i++) printf("%i : %i\n",i,datas[i]); 
-    printf("\n");
-    
     
  
