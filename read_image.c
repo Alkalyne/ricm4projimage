@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
 	exit(0);
 }
 
+//construit la totalité des histogrammes à partir d'un fichier contenant une liste de noms de fichiers
 void createHistograms(char * fileToRead)
 {
 	char stringIn[100];	
@@ -96,15 +97,37 @@ void init( int cube[],int length)
 void colorSection(int cube[], CIMAGE cim)
 {
 	int k;
-	for (int i = 0; i < cim.nx; i++) 
+	for (int j = 0; j < cim.nx; j++) 
 	{      
-		for (int j = 0; j < cim.ny; j++) 
+		for (int i = 0; i < cim.ny; i++) 
 		{ 
-			k = cim.r[i][j]/WIDTH + SIZE*cim.g[i][j]/WIDTH + SIZE*SIZE*cim.b[i][j]/WIDTH;
+			k = cim.r[i][j]/64 + 4*cim.g[i][j]/64 + 16*cim.b[i][j]/64;
+			if(k>=64)
+				printf("\nk : %i",k);
 			cube[k]++;
 		}
 	}
 }
 
 
+int datas[64];
+  
+  for(i =0; i<64;i++) datas[i] = 0;
+
+  for (j = 0; j < cim.nx; j++) {       /* ligne par ligne */
+    printf("  ");
+    for (i = 0; i < cim.ny; i++) {   /* pixel par pixel */
+     	
+	 int tempR = cim.r[i][j]/64;
+	 int tempB = cim.b[i][j]/64;
+	 int tempG = cim.g[i][j]/64;
+	 
+	 datas[tempR + tempB *4 + tempG*16]++;
+    }
+
+  }
+    for(i =0; i<64;i++) printf("%i : %i\n",i,datas[i]); 
+    printf("\n");
+    
+    
  
