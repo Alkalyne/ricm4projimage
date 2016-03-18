@@ -11,6 +11,9 @@ void printCube(float cube[],FILE *f){
 }
 
 void readCube(int position, FILE *f){
+  char buffer[200];
+  
   fseek(f,position*WIDTH,SEEK_SET);
-  //  fread(f
+  fread(buffer,sizeof(float),WIDTH,f);
+  printf("%s\n",buffer);
 }
