@@ -11,9 +11,15 @@ void printCube(float cube[],FILE *f){
 }
 
 void readCube(int position, FILE *f){
-  char buffer[200];
+  float buffer[WIDTH];
   
-  fseek(f,position*WIDTH,SEEK_SET);
-  fread(buffer,sizeof(float),WIDTH,f);
-  printf("%s\n",buffer);
+  //fseek(f,position*WIDTH,SEEK_SET);
+  fread(buffer,sizeof(buffer),1,f);
+  float sum=0;
+  for (int i=0;i<WIDTH;i++)
+  {
+  sum+=buffer[i];
+
+  }
+    printf("%f\n",sum);
 }

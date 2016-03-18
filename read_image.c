@@ -4,6 +4,8 @@
 #include <string.h>
 
 #include "rdjpeg.h"
+#include "functions.h"
+#include "constantes.h"
 
 #define SIZE 4
 #define WIDTH (SIZE*SIZE*SIZE)
@@ -11,14 +13,14 @@
 
 void init( float cube[],int length);
 void colorSection(float cube[], CIMAGE cim);
-void printCube(float cube[],int nbCol,FILE*f);
 void createHistograms(char * fileToRead);
-void processOneFile(char * stringIn);
+void processOneFile(char * stringIn, FILE*outFile);
 void normalise(float cube[],float nbPixel);
 
 int main(int argc, char *argv[])
 {
-	createHistograms("img/list.txt");
+	//createHistograms("img/list.txt");
+	readTst();
 	exit(0);
 }
 
@@ -31,6 +33,14 @@ void normalise(float cube[],float nbPixel)
 	}
 }
 
+void readTst()
+{
+ 	FILE *in;
+	FILE *out;
+	in = fopen("img/histograms", "r");
+	readCube(1, in);
+	fclose(in);
+}
 
 
 //construit la totalité des histogrammes à partir d'un fichier contenant une liste de noms de fichiers
@@ -38,63 +48,49 @@ void createHistograms(char * fileToRead)
 {
 	char stringIn[100];	
 	FILE *in;
+	FILE *out;
 	in = fopen(fileToRead, "r");
+	out = fopen("img/histograms", "w");
+	if(out == NULL)
+	{
+		printf("\nImpossible de créer le fichier histogramme\n");
+		exit(0);
+	}
+	
 	if(in == NULL)
 	{
 		printf("\nImpossible de lire le fichier %s\n",fileToRead);
 		exit(0);
 	}
 	
-	while (fgets(stringIn, 100, in) != NULL) 
+	while (fgets(stringIn, 100, in) != NULL)  // On lit toute la liste des fichiers
 	{
 		if(stringIn[strlen(stringIn) - 1] == '\n')
 			{stringIn[strlen(stringIn) - 1] = '\0';}
-  		printf("\nLecture en cours : %s",stringIn);
-		processOneFile(stringIn);
+  		printf("\nLecture en cours : %s",stringIn); // On récupère le nom du fichier à lire
+		processOneFile(stringIn,out); // Lit le fichier StringIn et écrit son histogramme dans out
 	}
 	fclose(in);
+	fclose(out);
 }
 
-//Prend un nom de fichier, le lit et créer son histogramme de couleur dans img/hist
-void processOneFile(char * stringIn)
+//Prend un fichier, le lit et écrit son histogramme dans un fichier de sortie
+void processOneFile(char * stringIn, FILE*outFile)
 {
-	FILE *out;
 	CIMAGE cim;
 	char toRead[100]="img/images/";
-	char toCreate[100]="img/hist/";
 	float cube[WIDTH];
 	init(cube,WIDTH);
-	
-	strcat(toCreate,stringIn);
-	out = fopen(toCreate, "w");
-	if(out == NULL)
-	{
-		printf("\nImpossible de créer le fichier %s\n",toCreate);
-		exit(0);
-	}
-	
+
 	strcat(toRead,stringIn);
 	read_cimage(toRead,&cim);
 	
 	colorSection(cube,cim); // Construit le cube
 	normalise(cube,cim.nx*cim.ny); // Normalise le cube 
-	printCube(cube,COL,out); // Ecrit le contenu du cube dans le fichier
-	
-	fclose(out);
+	printCube(cube,outFile); // Ecrit le contenu du cube dans le fichier
 }
 
-//Affiche le contenu d'un histogramme avec un saut de ligne toutes les nbCol multiples
-void printCube(float cube[],int nbCol,FILE*f)
-{
-   for (int j = 0; j < WIDTH; j++)
-   {
-   		fprintf(f,"%f ",cube[j]);
-   		if(j!=0 && (j+1)%nbCol==0)
-   		{
-   			fprintf(f,"\n");
-   		}
-   }
-}
+
 
 //Initialise un histogramme en le remplissant de 0
 void init(float cube[],int length)
