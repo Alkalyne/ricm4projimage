@@ -34,12 +34,12 @@ int main(int argc, char *argv[])
   if (DEBUG) print_debug_query(entries,m,qs,argc,argv);
 
   /* lecture de la liste des images */
-  list = readList("/u/q/quenotg/HMUL8R6A/PROJET/test/list.txt",&n);
+  list = readList("img/list.txt",&n);
   if (list == NULL) {printf("Failed to read %s file.\n","list.txt"); exitfail();}
   if (DEBUG) printf("Read list, %d images.<BR>\n",n);
   
   /* lecture des urls des images */
-  urls = readList("/u/q/quenotg/HMUL8R6A/PROJET/test/urls.txt",&n);
+  urls = readList("img/urls.txt",&n);
   if (list == NULL) {printf("Failed to read %s file.\n","list.txt"); exitfail();}
   if (DEBUG) printf("Read list, %d images.<BR>\n",n);
   
