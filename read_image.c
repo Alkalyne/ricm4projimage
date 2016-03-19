@@ -16,11 +16,12 @@ void colorSection(float cube[], CIMAGE cim);
 void createHistograms(char * fileToRead);
 void processOneFile(char * stringIn, FILE*outFile);
 void normalise(float cube[],float nbPixel);
+void readAllCubes();
 
 int main(int argc, char *argv[])
 {
-	//createHistograms("img/list.txt");
-	readTst();
+	createHistograms("img/list.txt");
+	readAllCubes();
 	exit(0);
 }
 
@@ -33,12 +34,17 @@ void normalise(float cube[],float nbPixel)
 	}
 }
 
-void readTst()
+void readAllCubes()
 {
+	int i=1;
  	FILE *in;
-	FILE *out;
 	in = fopen("img/histograms", "r");
-	readCube(1, in);
+	while (!feof(in))
+	{
+		printf("Reading line : %i\n",i);
+		readNextCube(in);
+		i++;
+	}
 	fclose(in);
 }
 
