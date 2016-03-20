@@ -6,30 +6,42 @@
 
 
 //Print the cube in binary form into f
-void printCube(float cube[],FILE *f)
+int printCube(float cube[],FILE *f)
 {
-	fwrite(cube,sizeof(float),WIDTH,f);
+	int res = fwrite(cube,sizeof(float),WIDTH,f);
+	//verifySumCube(cube);
+	return res;
 }
 
 void readCube_i(int position)
 {
  	FILE *f;
- 	f = fopen("img/histograms", "r");
+ 	f = fopen("img/histograms", "rb");
 	float buffer[WIDTH];
 
 	fseek(f,position*sizeof(buffer),SEEK_SET);
-	fread(buffer,sizeof(buffer),1,f);	
+	int res=fread(buffer,sizeof(float),WIDTH,f);
 	
+	if(res==0)
+	{
+		printf("\n ERROR : can't read histogramm %i\n",position);
+	}
+	else
+	{
+		verifySumCube(buffer);	
+	}
 	fclose(f);
 }
 
 
-
-void readNextCube(FILE *f)
+int readNextCube(FILE *f,float buffer[])
 {
-	float buffer[WIDTH];	
-	fread(buffer,sizeof(buffer),1,f);
-	verifySumCube(buffer);
+	int res =fread(buffer,sizeof(float),WIDTH,f);
+	if(res!=0) // on n'affiche pas s'il n'y avait rien à lire
+	{
+		//verifySumCube(buffer);
+	}
+	return res;
 }
 
 void verifySumCube(float buffer[])
@@ -41,9 +53,10 @@ void verifySumCube(float buffer[])
 		printf("%f ",buffer[i]);
 		if((i+1)%16==0 && i!=0)
 		{
-		printf("\n");
+			printf("\n");
 		}
 	}
-	printf("%f\n\n",sum);
+	printf("%.20f\n\n",sum);
+
 }
 

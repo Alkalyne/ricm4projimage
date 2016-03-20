@@ -7,23 +7,67 @@
 #include "functions.h"
 #include "constantes.h"
 
-#define SIZE 4
-#define WIDTH (SIZE*SIZE*SIZE)
-#define COL 4 //le nombre de valeurs à afficher avant un retour à la ligne
 
-void init( float cube[],int length);
-void colorSection(float cube[], CIMAGE cim);
-void createHistograms(char * fileToRead);
-void processOneFile(char * stringIn, FILE*outFile);
-void normalise(float cube[],float nbPixel);
-void readAllCubes();
+float euclidean_distance(float req[],float curr[]);//Calcul la distance euclidienne entre 2 histogrammes
+void process_euclidean_distance(char *request_image);//Calcul la distance euclidienne entre un fichier requête et tous les histogrammes de "img/histograms"
+void normalise(float cube[],float nbPixel);//normalise le cube pour transformer les valeurs entre 0 et 1
+void readAllCubes();//Lit tous les histogrammes
+void createHistograms(char * fileToRead,int iterations);//construit la totalité des histogrammes à partir d'un fichier contenant une liste de noms de fichiers
+void processOneFile(char * stringIn, FILE*outFile);//Prend un fichier, le lit et écrit son histogramme dans un fichier de sortie
+void init(float cube[],int length); //Initialise un histogramme en le remplissant de 0
+void colorSection(float cube[], CIMAGE cim); //Rempli le contenu d'un histogramme à partir d'une CIMAGE
+
 
 int main(int argc, char *argv[])
 {
-	createHistograms("img/list.txt");
+	createHistograms("img/list.txt",20); //paramètre "ALL" pour tout lire
 	readAllCubes();
+	//readCube_i(0);
+	//process_euclidean_distance("img/images/2008_000001.jpg");
 	exit(0);
 }
+
+
+//Calcul la distance euclidienne entre 2 histogrammes
+float euclidean_distance(float req[],float curr[])
+{
+	float res=0;
+	for (int i = 0; i < WIDTH; i++) 
+	{      
+		// A COMPLETER
+		// res +=req[i]*curr[i];
+	}
+	return res;
+}
+
+//Calcul la distance euclidienne entre un fichier requête et tous les histogrammes de "img/histograms"
+void process_euclidean_distance(char *request_image)
+{
+	CIMAGE request_cim;
+	float request_cube[WIDTH],current_cube[WIDTH];
+	init(request_cube,WIDTH);
+	init(current_cube,WIDTH);
+	// On récupère d'abord l'histogramme requête
+	read_cimage(request_image,&request_cim); // lit l'image requête
+	colorSection(request_cube,request_cim); // Construit le cube
+	normalise(request_cube,(float)request_cim.nx*request_cim.ny); // Normalise le cube
+	
+	int i=1;
+	float res;
+ 	FILE *in;
+	in = fopen("img/histograms", "rb"); 
+	while (!feof(in)) // On parcours les histogrammes
+	{
+		printf("Calculating euclidean distance with, line : %i",i);
+		readNextCube(in,current_cube); // On récupère l'histogramme de la ligne i du fichier
+		res=euclidean_distance(request_cube,current_cube); //On calcule la distance euclidienne
+		printf(" --- %f\n",res);
+		i++;
+	}
+	fclose(in);	
+}
+
+
 
 //normalise le cube pour transformer les valeurs entre 0 et 1
 void normalise(float cube[],float nbPixel)
@@ -34,15 +78,17 @@ void normalise(float cube[],float nbPixel)
 	}
 }
 
+//Lit tous les histogrammes
 void readAllCubes()
 {
 	int i=1;
+	float current_cube[WIDTH];
+	init(current_cube,WIDTH);
  	FILE *in;
-	in = fopen("img/histograms", "r");
-	while (!feof(in))
+	in = fopen("img/histograms", "rb");
+	while (readNextCube(in,current_cube)!=0)
 	{
-		printf("Reading line : %i\n",i);
-		readNextCube(in);
+		printf("\nEnd of reading histogram : %i",i);
 		i++;
 	}
 	fclose(in);
@@ -50,16 +96,17 @@ void readAllCubes()
 
 
 //construit la totalité des histogrammes à partir d'un fichier contenant une liste de noms de fichiers
-void createHistograms(char * fileToRead)
+void createHistograms(char * fileToRead,int iterations)
 {
 	char stringIn[100];	
+	int i=0;
 	FILE *in;
 	FILE *out;
 	in = fopen(fileToRead, "r");
-	out = fopen("img/histograms", "w");
+	out = fopen("img/histograms", "wb");
 	if(out == NULL)
 	{
-		printf("\nImpossible de créer le fichier histogramme\n");
+		printf("\nImpossible de créer le fichier \"histograms\"\n");
 		exit(0);
 	}
 	
@@ -69,12 +116,15 @@ void createHistograms(char * fileToRead)
 		exit(0);
 	}
 	
-	while (fgets(stringIn, 100, in) != NULL)  // On lit toute la liste des fichiers
+	//S'il n'y a pas un nombre d'itération en particulier, on lit tout
+	while ((iterations==ALL && fgets(stringIn, 100, in) != NULL)
+			|| (iterations!=ALL && fgets(stringIn, 100, in) != NULL && i<iterations))  
 	{
 		if(stringIn[strlen(stringIn) - 1] == '\n')
 			{stringIn[strlen(stringIn) - 1] = '\0';}
-  		printf("\nLecture en cours : %s",stringIn); // On récupère le nom du fichier à lire
+  		printf("\nCréation de l'histogramme: %s",stringIn); // On récupère le nom du fichier à lire
 		processOneFile(stringIn,out); // Lit le fichier StringIn et écrit son histogramme dans out
+		i++;
 	}
 	fclose(in);
 	fclose(out);
@@ -95,7 +145,6 @@ void processOneFile(char * stringIn, FILE*outFile)
 	normalise(cube,cim.nx*cim.ny); // Normalise le cube 
 	printCube(cube,outFile); // Ecrit le contenu du cube dans le fichier
 }
-
 
 
 //Initialise un histogramme en le remplissant de 0
