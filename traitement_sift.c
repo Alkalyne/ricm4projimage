@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+ 
 #define ALL -1
 void processSifts(char * fileToRead,int iterations);
 void processOneFile(char * stringIn,FILE *sample);
@@ -20,7 +21,7 @@ void processSifts(char * fileToRead,int iterations)
 	int i=0;
 	FILE *in;
 	FILE *sample ;
-	sample = fopen("img/sample.txt", "w");
+	sample = fopen("img/samples.txt", "w");
 	
 	in = fopen(fileToRead, "r");
 	
