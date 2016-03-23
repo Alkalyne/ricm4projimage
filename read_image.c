@@ -6,11 +6,12 @@
 #include "rdjpeg.h"
 #include "functions.h"
 #include "constantes.h"
+#include "proc.h"
 
 //Calcul la distance euclidienne entre 2 histogrammes
 float euclidean_distance(float req[],float curr[]);
-//Calcul la distance euclidienne entre un fichier requête et tous les histogrammes de "img/histograms"
-void process_euclidean_distance(char *request_image);
+//Calcul la distance euclidienne entre un fichier requête et tous les histogrammes de "img/histograms" pour les nb_iterations premiers histogrammes
+void process_euclidean_distance(char *request_image,int nb_iterations);
 //normalise le cube pour transformer les valeurs entre 0 et 1
 void normalise(float cube[],float nbPixel);
 //Lit tous les histogrammes
@@ -26,10 +27,10 @@ void colorSection(float cube[], CIMAGE cim);
 
 int main(int argc, char *argv[])
 {
-	createHistograms("img/list.txt",20); //paramètre "ALL" pour tout lire
+	createHistograms("img/list.txt",NBTOREAD); //paramètre "ALL" pour tout lire
 	//readAllCubes();
 	//readCube_i(0);
-	process_euclidean_distance("img/images/2008_000001.jpg");
+	process_euclidean_distance("img/images/2008_000001.jpg",NBTOREAD);
 	exit(0);
 }
 
@@ -46,31 +47,40 @@ float euclidean_distance(float req[],float curr[])
 }
 
 //Calcul la distance euclidienne entre un fichier requête et tous les histogrammes de "img/histograms"
-void process_euclidean_distance(char *request_image)
+void process_euclidean_distance(char *request_image, int iterations)
 {
 	CIMAGE request_cim;
 	float request_cube[WIDTH],current_cube[WIDTH];
 	init(request_cube,WIDTH);
 	init(current_cube,WIDTH);
+	KEY tableauTri[NBTOREAD];
 	// On récupère d'abord l'histogramme requête
 	read_cimage(request_image,&request_cim); // lit l'image requête
 	colorSection(request_cube,request_cim); // Construit le cube
 	normalise(request_cube,(float)request_cim.nx*request_cim.ny); // Normalise le cube
 	
-	int i=1;
+	int i=0;
 	float res;
  	FILE *in;
 	in = fopen("img/histograms", "rb"); 
-	while (!feof(in)) // On parcours les histogrammes
+	while (!feof(in) && (i < iterations)) // On parcours les histogrammes
 	{
 		printf("\nCalculating euclidean distance with, line : %i",i);
 		readNextCube(in,current_cube); // On récupère l'histogramme de la ligne i du fichier
 		res=euclidean_distance(request_cube,current_cube); //On calcule la distance euclidienne
-		printf(" --- %f",res);
-		i++;
+		tableauTri[i].d=res;
+		//printf(" --- %f",res);
+		tableauTri[i].k=i;
+		i++;	
 	}
+	qsort(tableauTri,NBTOREAD,sizeof(KEY),keyCompare);
+	for(int i =0;i<NBTOREAD;i++)
+	  {
+	    printf("rang : %d , distance : %f \n",tableauTri[i].k,tableauTri[i].d);
+	  }
 	fclose(in);
 	free_cimage(request_image,&request_cim);
+	
 }
 
 
@@ -180,6 +190,3 @@ void colorSection(float cube[], CIMAGE cim)
 		}
 	}
 }
-
-    
- 
