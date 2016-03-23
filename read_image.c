@@ -7,16 +7,22 @@
 #include "functions.h"
 #include "constantes.h"
 
-
-float euclidean_distance(float req[],float curr[]);//Calcul la distance euclidienne entre 2 histogrammes
-void process_euclidean_distance(char *request_image);//Calcul la distance euclidienne entre un fichier requête et tous les histogrammes de "img/histograms"
-void normalise(float cube[],float nbPixel);//normalise le cube pour transformer les valeurs entre 0 et 1
-void readAllCubes();//Lit tous les histogrammes
-void createHistograms(char * fileToRead,int iterations);//construit la totalité des histogrammes à partir d'un fichier contenant une liste de noms de fichiers
-void processOneFile(char * stringIn, FILE*outFile);//Prend un fichier, le lit et écrit son histogramme dans un fichier de sortie
-void init(float cube[],int length); //Initialise un histogramme en le remplissant de 0
-void colorSection(float cube[], CIMAGE cim); //Rempli le contenu d'un histogramme à partir d'une CIMAGE
-
+//Calcul la distance euclidienne entre 2 histogrammes
+float euclidean_distance(float req[],float curr[]);
+//Calcul la distance euclidienne entre un fichier requête et tous les histogrammes de "img/histograms"
+void process_euclidean_distance(char *request_image);
+//normalise le cube pour transformer les valeurs entre 0 et 1
+void normalise(float cube[],float nbPixel);
+//Lit tous les histogrammes
+void readAllCubes();
+//construit la totalité des histogrammes à partir d'un fichier contenant une liste de noms de fichiers
+void createHistograms(char * fileToRead,int iterations);
+//Prend un fichier, le lit et écrit son histogramme dans un fichier de sortie
+void processOneFile(char * stringIn, FILE*outFile);
+//Initialise un histogramme en le remplissant de 0
+void init(float cube[],int length); 
+//Rempli le contenu d'un histogramme à partir d'une CIMAGE
+void colorSection(float cube[], CIMAGE cim);
 
 int main(int argc, char *argv[])
 {
@@ -63,7 +69,8 @@ void process_euclidean_distance(char *request_image)
 		printf(" --- %f",res);
 		i++;
 	}
-	fclose(in);	
+	fclose(in);
+	free_cimage(request_image,&request_cim);
 }
 
 
@@ -143,6 +150,7 @@ void processOneFile(char * stringIn, FILE*outFile)
 	colorSection(cube,cim); // Construit le cube
 	normalise(cube,cim.nx*cim.ny); // Normalise le cube 
 	printCube(cube,outFile); // Ecrit le contenu du cube dans le fichier
+	free_cimage(toRead,&cim);
 }
 
 
