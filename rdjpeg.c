@@ -1,6 +1,4 @@
 #include "rdjpeg.h"
-#include <stdio.h>
-
 
 void read_cimage(char *name, CIMAGE *cim)
 {
@@ -62,3 +60,12 @@ void read_cimage(char *name, CIMAGE *cim)
   pclose(fp);
 }
 
+void free_cimage(char *name, CIMAGE *cim)
+{
+  free(*(cim->r));
+  free(*(cim->g));
+  free(*(cim->b));
+  free(cim->r);
+  free(cim->g);
+  free(cim->b);
+}

@@ -4,7 +4,6 @@
 #include <string.h>
 #include <strings.h>
 
-
 typedef struct {        /* image couleur         */
     int nx;             /* taille horizontale    */
     int ny;             /* taille verticale      */
@@ -14,3 +13,4 @@ typedef struct {        /* image couleur         */
 } CIMAGE;
 
 void read_cimage(char *name, CIMAGE *cim);
+void free_cimage(char *name, CIMAGE *cim);

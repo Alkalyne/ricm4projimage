@@ -21,9 +21,9 @@ void colorSection(float cube[], CIMAGE cim); //Rempli le contenu d'un histogramm
 int main(int argc, char *argv[])
 {
 	createHistograms("img/list.txt",20); //paramètre "ALL" pour tout lire
-	readAllCubes();
+	//readAllCubes();
 	//readCube_i(0);
-	//process_euclidean_distance("img/images/2008_000001.jpg");
+	process_euclidean_distance("img/images/2008_000001.jpg");
 	exit(0);
 }
 
@@ -34,8 +34,7 @@ float euclidean_distance(float req[],float curr[])
 	float res=0;
 	for (int i = 0; i < WIDTH; i++) 
 	{      
-		// A COMPLETER
-		// res +=req[i]*curr[i];
+		 res +=(req[i]-curr[i])*(req[i]-curr[i]);
 	}
 	return res;
 }
@@ -58,10 +57,10 @@ void process_euclidean_distance(char *request_image)
 	in = fopen("img/histograms", "rb"); 
 	while (!feof(in)) // On parcours les histogrammes
 	{
-		printf("Calculating euclidean distance with, line : %i",i);
+		printf("\nCalculating euclidean distance with, line : %i",i);
 		readNextCube(in,current_cube); // On récupère l'histogramme de la ligne i du fichier
 		res=euclidean_distance(request_cube,current_cube); //On calcule la distance euclidienne
-		printf(" --- %f\n",res);
+		printf(" --- %f",res);
 		i++;
 	}
 	fclose(in);	

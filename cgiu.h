@@ -16,10 +16,12 @@ typedef struct {
 
 int countword(char *line, char stop);
 char *getword(char *line, char stop);
+void unescape_url(char *url);
 
 void print_html_head(char *title);
 void print_debug_query(entry *entries, int m, char *qs, int argc, char *argv[]);
 void print_html_tail();
+void exit_test_ok();
 
 char *get_query_string(int argc, char *argv[]);
 entry *get_entries(char *query_string, int *nb_entries);

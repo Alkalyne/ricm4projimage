@@ -27,11 +27,11 @@ char *getword(char *line, char stop)
 
 char x2c(char *what)                        /* convert special characters hexa-coded */
 {
-    char digit;
-    digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A')+10 : (what[0] - '0'));
+    int digit;
+    digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A')+10 : (what[0] - '0')) ;
     digit *= 16;
     digit += (what[1] >= 'A' ? ((what[1] & 0xdf) - 'A')+10 : (what[1] - '0'));
-    return(digit);
+    return((char) digit);
 }
 
 void unescape_url(char *url)
@@ -73,7 +73,7 @@ void print_debug_query(entry *entries, int m, char *qs, int argc, char *argv[])
         printf("Aucune <code>QUERY_STRING</code> n'a &eacute;t&eacute; trouv&eacute;e<p>\n");
     } else {
         printf("<code>QUERY_STRING = \"%s\"</code><br>\n",qs);
-        printf("<code>CONTENT_LENGTH = %zd</code><p>\n",strlen(qs));
+        printf("<code>CONTENT_LENGTH = %d</code><p>\n",(int) strlen(qs));
     }
     for (x = 1; x < argc; x++)
         printf("<code>argv[%d] = \"%s\"</code><br>\n",x,argv[x]);
@@ -88,7 +88,7 @@ void print_debug_query(entry *entries, int m, char *qs, int argc, char *argv[])
     printf("</UL>\n");
     for (x = 1; x < argc; x++)
         printf("argv[%d]=\"%s\"<br>\n",x,argv[x]);
-    if (argc == 1) printf ("Pas d'arguments sur la ligne de commande.",x,argv[x]);
+    if (argc == 1) printf ("Pas d'arguments sur la ligne de commande.");
     printf("<p>\n");
 }
 
@@ -96,6 +96,14 @@ void print_html_tail()
 {
     printf("</BODY>\n");
     printf("</HTML>\n");
+}
+
+void exit_test_ok()
+{
+    print_html_head("Test");
+    printf("OK");
+    print_html_tail();
+    exit(0);
 }
 
 /*------------------------------------------------------------------------------------*/
@@ -144,9 +152,12 @@ entry *get_entries(char *query_string, int *nb_entries)
         *nb_entries = 0;
         return(NULL);
     }
-    qs = strdup(query_string);
+    if (!(qs = strdup(query_string))) return(NULL);
     *nb_entries = m = countword(qs,'&');
-    entries = (entry *) malloc(m*sizeof(entry));
+    if (!(entries = (entry *) malloc(m*sizeof(entry)))) { 
+	free(qs);
+	return(NULL);
+    }
     for(x = 0; x < m; x++) {
         entries[x].val = getword(qs,'&');
         plustospace(entries[x].val);
@@ -170,14 +181,14 @@ char **getparams(entry *entries, int m, char *name, int *nb_params)
     int i,n;
     char **params;
     for (i = n = 0; i < m; i++) n += !strcmp(entries[i].name,name);
+    *nb_params = n;
     if (n) {
         params = (char **) malloc(n*sizeof(char *));
         for (i = n = 0; i < m; i++)
             if (!strcmp(entries[i].name,name)) params[n++] = entries[i].val;
         return(params);
-    } else {
-        return(NULL);
     }
+    return(NULL);
 }
 
 int testparamvalue(entry *entries, int m, char *name, char *val)
