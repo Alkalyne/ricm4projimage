@@ -48,12 +48,14 @@ void processSifts(char * fileToRead,int iterations)
 
 void processOneFile(char * stringIn,FILE *sample)
 {
-	FILE *out,*in;
+	FILE *out,*outAll,*in;
 	char toRead[100]="img/sift/";
 	char toWrite[100]="img/simplified_sift/";
+	char toWriteAll[100]="img/simplified_sift_all/";
 	char stringRead[1000];
 	strcat(toRead,stringIn);
 	strcat(toWrite,stringIn);
+	strcat(toWriteAll,stringIn);
 	
 	in = fopen(toRead, "r");
 	if(in == NULL)
@@ -63,6 +65,13 @@ void processOneFile(char * stringIn,FILE *sample)
 	}
 	
 	out = fopen(toWrite, "w");
+	if(out == NULL)
+	{
+		printf("\nImpossible de créer le fichier %s",toWrite);
+		exit(0);
+	}
+	
+	outAll = fopen(toWriteAll, "w");
 	if(out == NULL)
 	{
 		printf("\nImpossible de créer le fichier %s",toWrite);
@@ -79,20 +88,23 @@ void processOneFile(char * stringIn,FILE *sample)
 	int i=0;
 	while (fgets(stringRead, 1000, in) != NULL) 
 	{
+		ret = strchr(stringRead, toFind);
+	    ret+=2*sizeof(char); // on se déplace de 2 caractères pour enlever l'espace et le ";"
+	    strcpy(stringRead,ret); // On copie la chaine pour pouvoir modifier les derniers caractères
+	    stringRead[strlen(stringRead) - 2] = '\n'; // on remplace le ";" par un saut de ligne
+	    stringRead[strlen(stringRead) - 1] = '\0'; // on remplace le "\n" par une fin de chaîne
+
+		fputs(stringRead, outAll);
+			
 		if(i%150==0) // une ligne toutes les 150
 		{
-		    ret = strchr(stringRead, toFind);
-		    ret+=2*sizeof(char); // on se déplace de 2 caractères pour enlever l'espace et le ";"
-		    strcpy(stringRead,ret); // On copie la chaine pour pouvoir modifier les derniers caractères
-		    stringRead[strlen(stringRead) - 2] = '\n'; // on remplace le ";" par un saut de ligne
-		    stringRead[strlen(stringRead) - 1] = '\0'; // on remplace le "\n" par une fin de chaîne
 			fputs(stringRead, out);
 			fputs(stringRead, sample);
 		}
 		
 		i++;		
 	}
-	
+	fclose(outAll);
 	fclose(out);
 	fclose(in);
 }

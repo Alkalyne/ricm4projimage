@@ -11,7 +11,7 @@
 //Calcul la distance euclidienne entre 2 histogrammes
 float euclidean_distance(float req[],float curr[]);
 //Calcul la distance euclidienne entre un fichier requête et tous les histogrammes de "img/histograms" pour les nb_iterations premiers histogrammes
-void process_euclidean_distance(char *request_image,int nbAffichage, int nbFichiers);
+void process_euclidean_distance(char *request_image,int nbAffichage);
 //normalise le cube pour transformer les valeurs entre 0 et 1
 void normalise(float cube[],float nbPixel);
 //Lit tous les histogrammes
@@ -24,8 +24,9 @@ void processOneFile(char * stringIn, FILE*outFile);
 void init(float cube[],int length); 
 //Rempli le contenu d'un histogramme à partir d'une CIMAGE
 void colorSection(float cube[], CIMAGE cim);
+void setFileNames();
 
-
+char nomFichiers[TOTAL_FICHIER][100];	
 	KEY tableauTri[TOTAL_FICHIER];
 	
 	
@@ -39,12 +40,13 @@ int main(int argc, char *argv[])
 		}
 		else if (strcmp(argv[1], "-e") == 0 && argc==4) 
 		{
-			process_euclidean_distance(argv[2],atoi(argv[3]),ALL);
+			setFileNames();
+			process_euclidean_distance(argv[2],atoi(argv[3]));
 		}
 		else
 		{
 			printf("\n Histogrammes : ./read_image -h [X premiers fichiers]");
-			printf("\n Distance euclidiennes : ./read_image -e [X premiers fichiers] [Fichier requête] [X premiers fichiers]");
+			printf("\n Distance euclidiennes : ./read_image -e [Fichier requête] [X premiers fichiers]");
 		}
 		//readAllCubes();
 		//readCube_i(0);
@@ -52,10 +54,24 @@ int main(int argc, char *argv[])
 	else
 	{
 		printf("\n Histogrammes : ./read_image -h [X premiers fichiers]");
-		printf("\n Distance euclidiennes : ./read_image -e [X premiers fichiers] [Fichier requête] [X premiers fichiers]");
+		printf("\n Distance euclidiennes : ./read_image -e [Fichier requête] [X premiers fichiers]");
 	}
-
 	exit(0);
+}
+
+void setFileNames()
+{
+	char stringIn[100];	
+	FILE *in = fopen("img/list.txt", "r");
+	int i=0;
+	while ( fgets(stringIn, 100, in) != NULL)  
+	{
+		if(stringIn[strlen(stringIn) - 1] == '\n')
+			{stringIn[strlen(stringIn) - 1] = '\0';}
+		strcpy(nomFichiers[i],stringIn);
+		i++;
+	}
+	fclose(in);
 }
 
 
@@ -74,7 +90,7 @@ float euclidean_distance(float req[],float curr[])
 
 	
 //Calcul la distance euclidienne entre un fichier requête et tous les histogrammes de "img/histograms"
-void process_euclidean_distance(char *request_image,int nbAffichage, int nbFichiers)
+void process_euclidean_distance(char *request_image,int nbAffichage)
 {
 	CIMAGE request_cim;
 	float request_cube[WIDTH],current_cube[WIDTH];
@@ -89,8 +105,7 @@ void process_euclidean_distance(char *request_image,int nbAffichage, int nbFichi
 	float res;
  	FILE *in;
 	in = fopen("img/histograms", "rb"); 
-	while ( (nbFichiers!=ALL && !feof(in) && i < nbFichiers)
-		|| ( nbFichiers==ALL && !feof(in) ) ) // On parcours les histogrammes
+	while (!feof(in)) // On parcours les histogrammes
 	{
 		printf("\nCalculating euclidean distance with line : %i",i);
 		readNextCube(in,current_cube); // On récupère l'histogramme de la ligne i du fichier
@@ -101,9 +116,10 @@ void process_euclidean_distance(char *request_image,int nbAffichage, int nbFichi
 		i++;	
 	}
 	qsort(tableauTri,TOTAL_FICHIER,sizeof(KEY),keyCompare);
+	printf("\nRésultats de la comparaison avec %s",request_image);
 	for(int i =0;i<nbAffichage;i++)
 	  {
-	    printf("\nrang : %i ---- fichier : %d , distance : %f",i+1,tableauTri[i].k,tableauTri[i].d);
+	    printf("\nrang : %i ---- fichier : %s , distance : %f",i+1,nomFichiers[tableauTri[i].k],tableauTri[i].d);
 	  }
 	fclose(in);
 	free_cimage(request_image,&request_cim);
@@ -166,6 +182,7 @@ void createHistograms(char * fileToRead,int iterations)
 			{stringIn[strlen(stringIn) - 1] = '\0';}
   		printf("\nCréation de l'histogramme: %s",stringIn); // On récupère le nom du fichier à lire
 		processOneFile(stringIn,out); // Lit le fichier StringIn et écrit son histogramme dans out
+		strcpy(nomFichiers[i],stringIn);
 		i++;
 	}
 	fclose(in);
