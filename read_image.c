@@ -25,6 +25,7 @@ void init(float cube[],int length);
 //Rempli le contenu d'un histogramme à partir d'une CIMAGE
 void colorSection(float cube[], CIMAGE cim);
 void setFileNames();
+void createHtml(char*requestFile,int nbAffichage);
 
 char nomFichiers[TOTAL_FICHIER][100];	
 	KEY tableauTri[TOTAL_FICHIER];
@@ -42,6 +43,7 @@ int main(int argc, char *argv[])
 		{
 			setFileNames();
 			process_euclidean_distance(argv[2],atoi(argv[3]));
+			createHtml(argv[2],atoi(argv[3]));
 		}
 		else
 		{
@@ -56,6 +58,7 @@ int main(int argc, char *argv[])
 		printf("\n Histogrammes : ./read_image -h [X premiers fichiers]");
 		printf("\n Distance euclidiennes : ./read_image -e [Fichier requête] [X premiers fichiers]");
 	}
+	printf("\n\n");
 	exit(0);
 }
 
@@ -118,11 +121,26 @@ void process_euclidean_distance(char *request_image,int nbAffichage)
 	qsort(tableauTri,TOTAL_FICHIER,sizeof(KEY),keyCompare);
 	printf("\nRésultats de la comparaison avec %s",request_image);
 	for(int i =0;i<nbAffichage;i++)
-	  {
-	    printf("\nrang : %i ---- fichier : %s , distance : %f",i+1,nomFichiers[tableauTri[i].k],tableauTri[i].d);
-	  }
+	{
+		printf("\nrang : %i ---- fichier : %s , distance : %f",i+1,nomFichiers[tableauTri[i].k],tableauTri[i].d);
+	}
 	fclose(in);
 	free_cimage(request_image,&request_cim);
+}
+
+void createHtml(char*requestFile,int nbAffichage)
+{
+ 	FILE *htmlFile;
+	htmlFile = fopen("resHistogrammesJPEG.html", "w"); 
+	fprintf(htmlFile,"<html>\n\t<body>\n");
+	fprintf(htmlFile,"\t\t<p><img src=\"%s\"></p>\n", requestFile);
+	
+	for(int i =0;i<nbAffichage;i++)
+	{
+		fprintf(htmlFile,"\t\t<p><img src=\"img/images/%s\"></p>\n", nomFichiers[tableauTri[i].k]);
+	}
+	fprintf(htmlFile,"\t</body>\n</html>\n");
+	fclose(htmlFile);
 }
 
 
@@ -182,7 +200,6 @@ void createHistograms(char * fileToRead,int iterations)
 			{stringIn[strlen(stringIn) - 1] = '\0';}
   		printf("\nCréation de l'histogramme: %s",stringIn); // On récupère le nom du fichier à lire
 		processOneFile(stringIn,out); // Lit le fichier StringIn et écrit son histogramme dans out
-		strcpy(nomFichiers[i],stringIn);
 		i++;
 	}
 	fclose(in);
