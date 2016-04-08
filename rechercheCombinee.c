@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 		{
 			printf("\n Histogrammes : ./rechercheCombinee -h [X premiers fichiers]");
 			printf("\n EXEMPLE : ./rechercheCombinee -h -1");
-			printf("\n Distance euclidiennes : ./rechercheCombinee -e [Fichier requête JPEG] [Fichier requête SIFT] [X premiers fichiers]");
+			printf("\n Distance euclidiennes : ./rechercheCombinee -e [Fichier requête JPEG] [Fichier requête SIFT] [X premiers fichiers] [Coeff JPG] [coeff SIFT]");
 			printf("\n EXEMPLE : ./rechercheCombinee -e img/images/2008_000020.jpg img/1nn/2008_000020.sift 6 2 5");
 		}
 		//readAllCubes();
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 	{
 		printf("\n Histogrammes : ./rechercheCombinee -h [X premiers fichiers]");
 		printf("\n EXEMPLE : ./rechercheCombinee -h -1");
-		printf("\n Distance euclidiennes : ./rechercheCombinee -e [Fichier requête JPEG] [Fichier requête SIFT] [X premiers fichiers]");
+		printf("\n Distance euclidiennes : ./rechercheCombinee -e [Fichier requête JPEG] [Fichier requête SIFT] [X premiers fichiers] [Coeff JPG] [coeff SIFT]");
 		printf("\n EXEMPLE : ./rechercheCombinee -e img/images/2008_000020.jpg img/1nn/2008_000020.sift 6 2 5");
 	}
 	printf("\n\n");
