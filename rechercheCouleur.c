@@ -47,16 +47,20 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			printf("\n Histogrammes : ./read_image -h [X premiers fichiers]");
-			printf("\n Distance euclidiennes : ./read_image -e [Fichier requête] [X premiers fichiers]");
+			printf("\n Histogrammes : ./rechercheCouleur -h [X premiers fichiers]");
+			printf("\n EXEMPLE : ./rechercheCouleur -h -1");
+			printf("\n Distance euclidiennes : ./rechercheCouleur -e [Fichier requête] [X premiers fichiers]");
+			printf("\n EXEMPLE : ./rechercheCouleur -e img/images/2008_000020.jpg 6 ");
 		}
 		//readAllCubes();
 		//readCube_i(0);
 	}
 	else
 	{
-		printf("\n Histogrammes : ./read_image -h [X premiers fichiers]");
-		printf("\n Distance euclidiennes : ./read_image -e [Fichier requête] [X premiers fichiers]");
+		printf("\n Histogrammes : ./rechercheCouleur -h [X premiers fichiers]");
+		printf("\n EXEMPLE : ./rechercheCouleur -h -1");
+		printf("\n Distance euclidiennes : ./rechercheCouleur -e [Fichier requête] [X premiers fichiers]");
+		printf("\n EXEMPLE : ./rechercheCouleur -e img/images/2008_000020.jpg 6 ");
 	}
 	printf("\n\n");
 	exit(0);
@@ -132,12 +136,16 @@ void createHtml(char*requestFile,int nbAffichage)
 {
  	FILE *htmlFile;
 	htmlFile = fopen("resHistogrammesJPEG.html", "w"); 
-	fprintf(htmlFile,"<html>\n\t<body>\n");
-	fprintf(htmlFile,"\t\t<p><img src=\"%s\"></p>\n", requestFile);
+	
+	fprintf(htmlFile,"\n<html><head><meta charset=\"UTF-8\"></head>");
+	fprintf(htmlFile,"\n\t<body>\n");
+	fprintf(htmlFile,"<h1>\nRequête :</h1>\n");
+	fprintf(htmlFile,"\t\t<img src=\"%s\"></br>\n", requestFile);
+	fprintf(htmlFile,"<h1>\n Résultats par couleur : %i</h1>\n",nbAffichage);
 	
 	for(int i =0;i<nbAffichage;i++)
 	{
-		fprintf(htmlFile,"\t\t<p><img src=\"img/images/%s\"></p>\n", nomFichiers[tableauTri[i].k]);
+		fprintf(htmlFile,"\t\t<img src=\"img/images/%s\">\n", nomFichiers[tableauTri[i].k]);
 	}
 	fprintf(htmlFile,"\t</body>\n</html>\n");
 	fclose(htmlFile);
