@@ -96,40 +96,43 @@ float euclidean_distance(float req[],float curr[])
 
 
 	
-//Calcul la distance euclidienne entre un fichier requête et tous les histogrammes de "img/histograms"
+//Calcule la distance euclidienne entre un fichier requête et tous les histogrammes de "img/histograms"
 void process_euclidean_distance(char *request_image,int nbAffichage)
 {
 	CIMAGE request_cim;
 	float request_cube[WIDTH],current_cube[WIDTH];
+	//On initialise nos histogrammes
 	init(request_cube,WIDTH);
 	init(current_cube,WIDTH);
 	// On récupère d'abord l'histogramme requête
 	read_cimage(request_image,&request_cim); // lit l'image requête
-	colorSection(request_cube,request_cim); // Construit le cube
-	normalise(request_cube,(float)request_cim.nx*request_cim.ny); // Normalise le cube
+	colorSection(request_cube,request_cim); // Construit le cube associé à l'image requête
+	normalise(request_cube,(float)request_cim.nx*request_cim.ny); // Normalise le cube requête
 	
 	int i=0;
 	float res;
  	FILE *in;
 	in = fopen("img/histograms", "rb"); 
-	while (!feof(in)) // On parcours les histogrammes
+	while (!feof(in)) // On parcours tous les histogrammes
 	{
 		printf("\nCalculating euclidean distance with line : %i",i);
-		readNextCube(in,current_cube); // On récupère l'histogramme de la ligne i du fichier
-		res=euclidean_distance(request_cube,current_cube); //On calcule la distance euclidienne
+		readNextCube(in,current_cube); // On récupère l'histogramme suivant
+		res=euclidean_distance(request_cube,current_cube); //On calcule la distance euclidienne entre la requêtre et l'histogramme actuel
 		tableauTri[i].d=res;
 		printf(" --- %f",res);
 		tableauTri[i].k=i;
 		i++;	
 	}
+	//On tri les résultats obtenus selon leur distance euclidienne
 	qsort(tableauTri,TOTAL_FICHIER,sizeof(KEY),keyCompare);
 	printf("\nRésultats de la comparaison avec %s",request_image);
-	for(int i =0;i<nbAffichage;i++)
+	//On affiche les X premiers résultats dans la console
+	for(int i =0;i<nbAffichage;i++) 
 	{
 		printf("\nrang : %i ---- fichier : %s , distance : %f",i+1,nomFichiers[tableauTri[i].k],tableauTri[i].d);
 	}
-	fclose(in);
-	free_cimage(request_image,&request_cim);
+	fclose(in); // on ferme le fichier
+	free_cimage(request_image,&request_cim); // on libère l'image
 }
 
 void createHtml(char*requestFile,int nbAffichage)
@@ -137,15 +140,18 @@ void createHtml(char*requestFile,int nbAffichage)
  	FILE *htmlFile;
 	htmlFile = fopen("resHistogrammesJPEG.html", "w"); 
 	
-	fprintf(htmlFile,"\n<html><head><meta charset=\"UTF-8\"></head>");
+	fprintf(htmlFile,"\n<html><head><meta charset=\"UTF-8\"><title>Recherche par Couleur</title></head>");
 	fprintf(htmlFile,"\n\t<body>\n");
-	fprintf(htmlFile,"<h1>\nRequête :</h1>\n");
-	fprintf(htmlFile,"\t\t<img src=\"%s\"></br>\n", requestFile);
-	fprintf(htmlFile,"<h1>\n Résultats par couleur : %i</h1>\n",nbAffichage);
+	fprintf(htmlFile,"\n<a href='resHistogrammesCombinee.html'>Recherche combinee</a><br>");
+	fprintf(htmlFile,"\n<a href='resHistogrammesJPEG.html'>Recherche par couleur</a><br>");
+	fprintf(htmlFile,"\n<a href='resHistogrammesSift.html'>Recherche par formes</a>");
+	fprintf(htmlFile,"<h1>\nRequete image numero \"%s\"</h1>\n", requestFile);
+	fprintf(htmlFile,"\t\t<img src=\"%s\" height='300px' width='400px'></br>\n", requestFile);
+	fprintf(htmlFile,"<h1>\n Resultats par couleur : nombre %i</h1>\n",nbAffichage);
 	
 	for(int i =0;i<nbAffichage;i++)
 	{
-		fprintf(htmlFile,"\t\t<img src=\"img/images/%s\">\n", nomFichiers[tableauTri[i].k]);
+		fprintf(htmlFile,"\t\t<img src=\"img/images/%s\"height='300px' width='400px'>\n", nomFichiers[tableauTri[i].k]);
 	}
 	fprintf(htmlFile,"\t</body>\n</html>\n");
 	fclose(htmlFile);

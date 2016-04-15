@@ -190,11 +190,16 @@ void createHtml(char*requestFile,int nbAffichage)
 	cpy[strlen(cpy)-5]='\0';
 	strcat(cpy,".jpg");
 	
-	fprintf(htmlFile,"\n<html><head><meta charset=\"UTF-8\"></head>");
+
+	fprintf(htmlFile,"\n<html><head><meta charset=\"UTF-8\"><title>Recherche Sift</title></head>");
 	fprintf(htmlFile,"\n\t<body>\n");
-	fprintf(htmlFile,"<h1>\nRequête :</h1>\n");
-	fprintf(htmlFile,"\t\t<img src=\"img/images/%s\"></br>\n", cpy);
-	fprintf(htmlFile,"<h1>\n Résultats par formes : %i</h1>\n",nbAffichage);
+	fprintf(htmlFile,"\n<a href='resHistogrammesCombinee.html'>Recherche combinée</a><br>");
+	fprintf(htmlFile,"\n<a href='resHistogrammesJPEG.html'>Recherche par couleur</a><br>");
+	fprintf(htmlFile,"\n<a href='resHistogrammesSift.html'>Recherche par formes</a>");
+	fprintf(htmlFile,"<h1>\nRequête image n° \"%s\"</h1>\n", cpy);
+	fprintf(htmlFile,"\t\t<img src=\"img/images/%s\" height='300px' width='400px'></br>\n",cpy);
+	fprintf(htmlFile,"<h1>\n Résultats par forme (sift) : nombre %i</h1>\n",nbAffichage);
+	
 	
 	for(int i =0;i<nbAffichage;i++)
 	{
@@ -202,7 +207,7 @@ void createHtml(char*requestFile,int nbAffichage)
 		cpy[strlen(nomFichiers_SIFT[tableauTri_SIFT[i].k])-5]='\0';
 		strcat(cpy,".jpg");
 
-		fprintf(htmlFile,"\t\t<img src=\"img/images/%s\">\n",cpy );
+		fprintf(htmlFile,"\t\t<img src=\"img/images/%s\" height='300px' width='400px'>\n",cpy );
 	}
 	fprintf(htmlFile,"\t</body>\n</html>\n");
 	fclose(htmlFile);

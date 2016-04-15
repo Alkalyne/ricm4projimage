@@ -98,14 +98,17 @@ void createHtml(char*requestFile,int coeffJPEG,int coeffSIFT,int nbAffichage)
 
  	FILE *htmlFile;
 	htmlFile = fopen("resHistogrammesCombinee.html", "w"); 
-	fprintf(htmlFile,"\n<html><head><meta charset=\"UTF-8\"></head>");
+	fprintf(htmlFile,"\n<html><head><meta charset=\"UTF-8\"><title>Recherche Combinée</title></head>");
 	fprintf(htmlFile,"\n\t<body>\n");
-	fprintf(htmlFile,"<h1>\nRequête :</h1>\n");
-	fprintf(htmlFile,"\t\t<img src=\"%s\"></br>\n", requestFile);
-	fprintf(htmlFile,"<h1>\n Résultats combinés : %i</h1>\n",nbAffichage);
+	fprintf(htmlFile,"\n<a href='resHistogrammesCombinee.html'>Recherche combinée</a><br>");
+	fprintf(htmlFile,"\n<a href='resHistogrammesJPEG.html'>Recherche par couleur</a><br>");
+	fprintf(htmlFile,"\n<a href='resHistogrammesSift.html'>Recherche par formes</a>");
+	fprintf(htmlFile,"<h1>\nRequête image n° \"%s\"</h1>\n", requestFile);
+	fprintf(htmlFile,"\t\t<img src=\"%s\" height='300px' width='400px'></br>\n", requestFile);
+	fprintf(htmlFile,"<h1>\n Résultats combinés : nombre %i</h1>\n",nbAffichage);
 	for(int i =0;i<nbAffichage;i++)
 	{
-		fprintf(htmlFile,"\t\t<img src=\"img/images/%s\">\n", nomFichiers[tableauTri[i].k]);
+		fprintf(htmlFile,"\t\t<img src=\"img/images/%s\"height='300px' width='400px'>\n", nomFichiers[tableauTri[i].k]);
 	}
 	fprintf(htmlFile,"\t</body>\n</html>\n");
 	fclose(htmlFile);
